@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tea Leaf Language - Ta'ang</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+    <style>
+        :root {
+            --primary-maroon: #6e0d0d;
+            --dark-maroon: #4a0606;
+            --cream: #fdf5e6;
+            --gold: #d4af37;
+            --tea-green: #4F7942;
+        }
+
+        body {
+            /* ၁။ ပေးထားသော ရိုးရာနောက်ခံပုံကို အသုံးပြုခြင်း */
+            background-image: linear-gradient(rgba(110, 13, 13, 0.85), rgba(42, 3, 3, 0.95)), 
+                              url('background.jpg'); 
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            
+            color: var(--cream);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* --- Splash Screen Styles --- */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--primary-maroon), #2a0303);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .splash-content { text-align: center; }
+        .logo-wrapper { width: 120px; height: 120px; margin: 0 auto 20px; animation: pulse 2s infinite ease-in-out; }
+        .splash-logo { width: 100%; filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.4)); }
+        .app-name { color: var(--gold); font-size: 2.2rem; letter-spacing: 4px; margin: 10px 0 5px; font-weight: 900; }
+        .loader { width: 150px; height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; margin: 20px auto 0; overflow: hidden; }
+        .loader-bar { width: 0%; height: 100%; background: var(--gold); animation: loading 2.5s forwards ease-in-out; }
+
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes loading { 0% { width: 0%; } 100% { width: 100%; } }
+        .fade-out { opacity: 0; visibility: hidden; }
+
+        /* --- Main App Component Styles --- */
+        .dialect-bar {
+            width: 100%;
+            background: rgba(0,0,0,0.5);
+            padding: 15px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+
+        .dialect-btn {
+            background: transparent;
+            border: 1.5px solid var(--gold);
+            color: var(--gold);
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .dialect-btn.active { background: var(--gold); color: var(--primary-maroon); font-weight: bold; }
+
+        .streak-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .streak-number { font-size: 3.5rem; font-weight: 900; color: var(--gold); z-index: 5; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
+
+        .leaf-svg { position: absolute; width: 55px; height: 55px; }
+        .l1 { top: 0; transform: rotate(0deg); }
+        .l2 { right: 10px; top: 40px; transform: rotate(72deg); }
+        .l3 { right: 40px; bottom: 0; transform: rotate(144deg); }
+        .l4 { left: 40px; bottom: 0; transform: rotate(216deg); }
+        .l5 { left: 10px; top: 40px; transform: rotate(288deg); }
+
+        .card {
+            background: var(--cream);
+            color: var(--primary-maroon);
+            width: 85%;
+            max-width: 380px;
+            border-radius: 25px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            margin-bottom: 30px;
+        }
+
+        .word-main { font-size: 2.5rem; margin: 10px 0; font-weight: bold; }
+        .word-sub { color: #555; font-style: italic; margin-bottom: 20px; }
+
+        .circle-btn {
+            width: 55px; height: 55px; border-radius: 50%; border: none;
+            display: inline-flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s; margin: 0 10px;
+        }
+        .btn-audio { background: #eee; color: var(--primary-maroon); }
+        .btn-mic { background: var(--primary-maroon); color: white; }
+
+        .level-section { width: 85%; max-width: 380px; margin-bottom: 100px; }
+        .progress-bg { height: 12px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; border: 1px solid rgba(212, 175, 55, 0.3); }
+        .progress-fill { width: 45%; height: 100%; background: linear-gradient(90deg, var(--gold), #ffdf80); }
+
+        .nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: rgba(42, 3, 3, 0.95);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            border-top: 1px solid var(--gold);
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-item { color: var(--cream); text-decoration: none; text-align: center; font-size: 0.7rem; opacity: 0.6; }
+        .nav-item.active { opacity: 1; color: var(--gold); }
+    </style>
+</head>
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <div class="logo-wrapper">
+                <svg viewBox="0 0 100 100" class="splash-logo">
+                    <path d="M50 90 C 20 90, 5 50, 50 10 C 95 50, 80 90, 50 90" fill="#4F7942"/>
+                    <path d="M50 90 L 50 15" stroke="#d4af37" stroke-width="3" fill="none"/>
+                </svg>
+            </div>
+            <h1 class="app-name">TEA LEAF</h1>
+            <p style="color: var(--cream); opacity: 0.8;">Ta'ang Language App</p>
+            <div class="loader"><div class="loader-bar"></div></div>
+        </div>
+    </div>
+
+    <div class="dialect-bar">
+        <button class="dialect-btn active">နီရရတ် (Pale)</button>
+        <button class="dialect-btn">ငုတာ (Rumai)</button>
+        <button class="dialect-btn">ရှာယန်း</button>
+    </div>
+
+    <div class="streak-container">
+        <div class="streak-number">၅</div>
+        <div class="leaf-svg l1"><svg viewBox="0 0 100 100"><path d="M50 80 C 20 80, 10 50, 50 20 C 90 50, 80 80, 50 80" fill="#4F7942"/></svg></div>
+        <div class="leaf-svg l2"><svg viewBox="0 0 100 100"><path d="M50 80 C 20 80, 10 50, 50 20 C 90 50, 80 80, 50 80" fill="#4F7942"/></svg></div>
+        <div class="leaf-svg l3"><svg viewBox="0 0 100 100"><path d="M50 80 C 20 80, 10 50, 50 20 C 90 50, 80 80, 50 80" fill="#4F7942"/></svg></div>
+        <div class="leaf-svg l4"><svg viewBox="0 0 100 100"><path d="M50 80 C 20 80, 10 50, 50 20 C 90 50, 80 80, 50 80" fill="#4F7942"/></svg></div>
+        <div class="leaf-svg l5"><svg viewBox="0 0 100 100"><path d="M50 80 C 20 80, 10 50, 50 20 C 90 50, 80 80, 50 80" fill="#4F7942"/></svg></div>
+    </div>
+    <p style="color: var(--gold); margin-bottom: 20px;">လက်ဖက်ညွန့် ၅ ညွန့် ရှင်သန်နေပြီ</p>
+
+    <div class="card">
+        <h1 class="word-main">ရိုဆေ</h1>
+        <p class="word-sub">Ro Say (မင်္ဂလာပါ)</p>
+        <div class="action-btns">
+            <button class="circle-btn btn-audio"><span class="material-icons-round">volume_up</span></button>
+            <button class="circle-btn btn-mic"><span class="material-icons-round">mic</span></button>
+        </div>
+    </div>
+
+    <div class="level-section">
+        <div class="progress-bg"><div class="progress-fill"></div></div>
+    </div>
+
+    <nav class="nav">
+        <a href="#" class="nav-item active"><span class="material-icons-round">home</span><br>ပင်မ</a>
+        <a href="#" class="nav-item"><span class="material-icons-round">book</span><br>အဘိဓာန်</a>
+        <a href="#" class="nav-item"><span class="material-icons-round">account_circle</span><br>ကိုယ်ရေး</a>
+    </nav>
+
+    <script>
+        // Splash Screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('splash-screen').classList.add('fade-out');
+            }, 3000);
+        });
+
+        // Dialect Selector
+        document.querySelectorAll('.dialect-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelector('.dialect-btn.active').classList.remove('active');
+                this.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
